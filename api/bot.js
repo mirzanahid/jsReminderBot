@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const cron = require("node-cron");
 
 
-const telegramWebhookUrl = "https://vercel.com/mirzanahids-projects/js-reminder-bot/api/bot";
+const telegramWebhookUrl = "https://js-reminder-bot.vercel.app//api/bot";
 
 // Set the webhook for the Telegram bot
 bot.setWebHook(telegramWebhookUrl);
