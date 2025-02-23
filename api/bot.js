@@ -1,10 +1,10 @@
-require('dotenv').config({ path: '../.env' });
+require('dotenv').config();
 const TelegramBot = require("node-telegram-bot-api");
 const mongoose = require("mongoose");
 const cron = require("node-cron");
 
 
-const telegramWebhookUrl = "https://js-reminder-bot.vercel.app//api/bot";
+
 
 // Set the webhook for the Telegram bot
 bot.setWebHook(telegramWebhookUrl);
@@ -45,6 +45,10 @@ const User = mongoose.model(
 
 // Telegram bot setup
 const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, { polling: true });
+
+const telegramWebhookUrl = "https://js-reminder-bot.vercel.app/api/bot";
+bot.setWebHook(telegramWebhookUrl);
+
 const toke = process.env.TELEGRAM_TOKEN
 // Command: /help
 bot.onText(/\/help/, (msg) => {
@@ -270,13 +274,13 @@ bot.onText(/\/remindtime/, async (msg) => {
 
 module.exports = async (req, res) => {
   if (req.method === "POST") {
-    const bot = new TelegramBot(process.env.TELEGRAM_TOKEN);
-    
-    // Process the update from Telegram
-    const update = req.body;
-    bot.processUpdate(update);
-
-    res.status(200).send("OK");
+    try {
+      await bot.processUpdate(req.body);
+      res.status(200).send("OK");
+    } catch (error) {
+      console.error("Error processing update:", error);
+      res.status(500).send("Internal Server Error");
+    }
   } else {
     res.status(405).send("Method Not Allowed");
   }
