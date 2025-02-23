@@ -2,7 +2,13 @@ require('dotenv').config({ path: '../.env' });
 const TelegramBot = require("node-telegram-bot-api");
 const mongoose = require("mongoose");
 const cron = require("node-cron");
-console.log(process.env.MONGO_URI)
+
+
+const telegramWebhookUrl = "https://vercel.com/mirzanahids-projects/js-reminder-bot/api/bot";
+
+// Set the webhook for the Telegram bot
+bot.setWebHook(telegramWebhookUrl);
+
 // MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI, {
@@ -218,12 +224,6 @@ bot.onText(/\/fullphase (\d+)/, async (msg, match) => {
 });
 
 
-
-
-
-
-
-
 // Command: /timeset [HH:MM]
 bot.onText(/\/timeset (\d{1,2}:\d{2})/, async (msg, match) => {
   const telegramUserId = msg.from.id.toString();
@@ -267,3 +267,17 @@ bot.onText(/\/remindtime/, async (msg) => {
 
   bot.sendMessage(telegramUserId, `Your current reminder time is ${formattedTime}.`);
 });
+
+module.exports = async (req, res) => {
+  if (req.method === "POST") {
+    const bot = new TelegramBot(process.env.TELEGRAM_TOKEN);
+    
+    // Process the update from Telegram
+    const update = req.body;
+    bot.processUpdate(update);
+
+    res.status(200).send("OK");
+  } else {
+    res.status(405).send("Method Not Allowed");
+  }
+};
