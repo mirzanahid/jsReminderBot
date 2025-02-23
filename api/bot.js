@@ -44,7 +44,7 @@ const User = mongoose.model(
 );
 
 // Telegram bot setup
-const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, { polling: true });
+const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, { polling: false });
 
 const telegramWebhookUrl = "https://js-reminder-bot.vercel.app/api/bot";
 bot.setWebHook(telegramWebhookUrl);
