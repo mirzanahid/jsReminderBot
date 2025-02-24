@@ -281,24 +281,28 @@ bot.onText(/\/remindtime/, async (msg) => {
 });
 
 
-
 module.exports = async (req, res) => {
   console.log(`Request Method: ${req.method}`);
   console.log(`Request Body:`, req.body);
 
   if (req.method === "GET") {
-    res.status(204).send("No Content");
+    // Send response for GET method and exit
+    return res.status(204).send("No Content");
   }
 
   if (req.method === "POST") {
     try {
+      // Process the update only if no error has occurred yet
       await bot.processUpdate(req.body);
-      res.status(200).send("OK");
+      return res.status(200).send("OK");
     } catch (error) {
       console.error("Error processing update:", error);
-      res.status(500).send("Internal Server Error");
+      // Only send the response if no response has been sent already
+      if (!res.headersSent) {
+        return res.status(500).send("Internal Server Error");
+      }
     }
   } else {
-    res.status(405).send("Method Not Allowed");
+    return res.status(405).send("Method Not Allowed");
   }
 };
