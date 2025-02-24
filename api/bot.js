@@ -4,13 +4,14 @@ const mongoose = require("mongoose");
 const cron = require("node-cron");
 
 // MongoDB connection
-mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
-  .then(() => console.log("MongoDB connected successfully"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}).then(() => console.log("MongoDB connected successfully"))
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+    process.exit(1); // Exit the process if the connection fails
+  });
 
 // Define Mongoose models
 const Reminder = mongoose.model(
@@ -41,7 +42,9 @@ const User = mongoose.model(
 const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, { polling: false });
 
 const telegramWebhookUrl = "https://js-reminder-bot.vercel.app/api/bot";
-bot.setWebHook(telegramWebhookUrl);
+bot.setWebHook(telegramWebhookUrl)
+  .then(() => console.log("Webhook set successfully"))
+  .catch((err) => console.error("Error setting webhook:", err));
 
 // Command: /help
 bot.onText(/\/help/, (msg) => {
@@ -286,14 +289,12 @@ module.exports = async (req, res) => {
   console.log(`Request Body:`, req.body);
 
   if (req.method === "GET") {
-    // Send response for GET method and exit
-    return res.status(204).send("No Content");
+    return res.status(200).send("Webhook is working");
   }
-
   if (req.method === "POST") {
     try {
       // Process the update only if no error has occurred yet
-      await bot.processUpdate(req.body);
+       bot.processUpdate(req.body);
       return res.status(200).send("OK");
     } catch (error) {
       console.error("Error processing update:", error);
