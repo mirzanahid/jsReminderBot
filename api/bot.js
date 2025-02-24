@@ -1,15 +1,15 @@
-require('dotenv').config();
+require("dotenv").config();
 const TelegramBot = require("node-telegram-bot-api");
 const mongoose = require("mongoose");
 const cron = require("node-cron");
 
-
-// Telegram bot setup
-const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, { polling: false });
-
 // MongoDB connection
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 30000, // 30 seconds
+  })
   .then(() => console.log("MongoDB connected successfully"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
@@ -38,6 +38,8 @@ const User = mongoose.model(
   })
 );
 
+// Telegram bot setup
+const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, { polling: false });
 
 const telegramWebhookUrl = "https://js-reminder-bot.vercel.app/api/bot";
 bot.setWebHook(telegramWebhookUrl);
@@ -219,7 +221,6 @@ bot.onText(/\/fullphase (\d+)/, async (msg, match) => {
   }
 });
 
-
 // Command: /timeset [HH:MM]
 bot.onText(/\/timeset (\d{1,2}:\d{2})/, async (msg, match) => {
   const telegramUserId = msg.from.id.toString();
@@ -228,13 +229,18 @@ bot.onText(/\/timeset (\d{1,2}:\d{2})/, async (msg, match) => {
   // Validate time format
   const [hour, minute] = timeInput.split(":").map(Number);
   if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
-    return bot.sendMessage(telegramUserId, "Invalid time format. Use HH:MM (24-hour format). Example: /timeset 20:30 for 8:30 PM.");
+    return bot.sendMessage(
+      telegramUserId,
+      "Invalid time format. Use HH:MM (24-hour format). Example: /timeset 20:30 for 8:30 PM."
+    );
   }
 
   // Convert to 12-hour format
   const amPm = hour >= 12 ? "PM" : "AM";
   const hour12 = hour % 12 || 12;
-  const formattedTime = `${hour12}:${minute.toString().padStart(2, "0")} ${amPm}`;
+  const formattedTime = `${hour12}:${minute
+    .toString()
+    .padStart(2, "0")} ${amPm}`;
 
   // Update user reminder time
   await User.findOneAndUpdate(
@@ -243,7 +249,10 @@ bot.onText(/\/timeset (\d{1,2}:\d{2})/, async (msg, match) => {
     { upsert: true }
   );
 
-  bot.sendMessage(telegramUserId, `Your reminder time has been set to ${formattedTime}.`);
+  bot.sendMessage(
+    telegramUserId,
+    `Your reminder time has been set to ${formattedTime}.`
+  );
 });
 
 // Command: /remindtime
@@ -252,16 +261,24 @@ bot.onText(/\/remindtime/, async (msg) => {
   const user = await User.findOne({ telegramUserId });
 
   if (!user || !user.reminderTime) {
-    return bot.sendMessage(telegramUserId, "You have not set a reminder time. Use /timeset HH:MM to set one.");
+    return bot.sendMessage(
+      telegramUserId,
+      "You have not set a reminder time. Use /timeset HH:MM to set one."
+    );
   }
 
   // Convert stored 24-hour time to 12-hour format
   const [hour, minute] = user.reminderTime.split(":").map(Number);
   const amPm = hour >= 12 ? "PM" : "AM";
   const hour12 = hour % 12 || 12;
-  const formattedTime = `${hour12}:${minute.toString().padStart(2, "0")} ${amPm}`;
+  const formattedTime = `${hour12}:${minute
+    .toString()
+    .padStart(2, "0")} ${amPm}`;
 
-  bot.sendMessage(telegramUserId, `Your current reminder time is ${formattedTime}.`);
+  bot.sendMessage(
+    telegramUserId,
+    `Your current reminder time is ${formattedTime}.`
+  );
 });
 
 module.exports = async (req, res) => {
