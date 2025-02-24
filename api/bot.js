@@ -4,11 +4,6 @@ const mongoose = require("mongoose");
 const cron = require("node-cron");
 
 
-
-
-// Set the webhook for the Telegram bot
-bot.setWebHook(telegramWebhookUrl);
-
 // MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI, {
