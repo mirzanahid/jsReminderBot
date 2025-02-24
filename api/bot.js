@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const cron = require("node-cron");
 
 // MongoDB connection
-mongoose.connect(process.env.MONGO_URI).then(() => console.log("MongoDB connected successfully"))
+mongoose.connect(process.env.MONGO_URI,{serverSelectionTimeoutMS: 30000, }).then(() => console.log("MongoDB connected successfully"))
   .catch((err) => {
     console.error("MongoDB connection error:", err);
     process.exit(1); // Exit the process if the connection fails
