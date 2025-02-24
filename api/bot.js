@@ -294,7 +294,7 @@ module.exports = async (req, res) => {
   if (req.method === "POST") {
     try {
       // Process the update only if no error has occurred yet
-       bot.processUpdate(req.body);
+      await bot.processUpdate(req.body);
       return res.status(200).send("OK");
     } catch (error) {
       console.error("Error processing update:", error);
