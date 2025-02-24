@@ -281,7 +281,24 @@ bot.onText(/\/remindtime/, async (msg) => {
   );
 });
 
+// module.exports = async (req, res) => {
+//   if (req.method === "POST") {
+//     try {
+//       await bot.processUpdate(req.body);
+//       res.status(200).send("OK");
+//     } catch (error) {
+//       console.error("Error processing update:", error);
+//       res.status(500).send("Internal Server Error");
+//     }
+//   } else {
+//     res.status(405).send("Method Not Allowed");
+//   }
+// };
+
 module.exports = async (req, res) => {
+  console.log(`Request Method: ${req.method}`);
+  console.log(`Request Body:`, req.body);
+
   if (req.method === "POST") {
     try {
       await bot.processUpdate(req.body);
