@@ -4,6 +4,9 @@ const mongoose = require("mongoose");
 const cron = require("node-cron");
 
 
+// Telegram bot setup
+const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, { polling: false });
+
 // MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI, {
@@ -38,8 +41,6 @@ const User = mongoose.model(
   })
 );
 
-// Telegram bot setup
-const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, { polling: false });
 
 const telegramWebhookUrl = "https://js-reminder-bot.vercel.app/api/bot";
 bot.setWebHook(telegramWebhookUrl);
