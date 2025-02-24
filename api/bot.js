@@ -44,7 +44,6 @@ const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, { polling: false });
 const telegramWebhookUrl = "https://js-reminder-bot.vercel.app/api/bot";
 bot.setWebHook(telegramWebhookUrl);
 
-const toke = process.env.TELEGRAM_TOKEN
 // Command: /help
 bot.onText(/\/help/, (msg) => {
   const telegramUserId = msg.from.id.toString();
